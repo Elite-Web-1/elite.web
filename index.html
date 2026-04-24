@@ -525,15 +525,16 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(10, 10, 10, 0.98);
-        backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
+        width: 100vw;
+        height: 100vh;
+        background: #0a0a0a;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 2.5rem;
         z-index: 100;
         padding: 0;
+        margin: 0;
       }
 
       /* Menú móvil — visible cuando tiene la clase "open" */
@@ -542,8 +543,21 @@
       }
 
       .nav-links a {
-        font-size: 1.5rem;
+        font-size: 1.75rem;
+        font-weight: 500;
+        letter-spacing: -0.02em;
         color: var(--text);
+        padding: 0.5rem 1rem;
+        transition: opacity 0.2s ease;
+      }
+
+      .nav-links li {
+        list-style: none;
+      }
+
+      .nav-links a:hover,
+      .nav-links a:active {
+        opacity: 0.6;
       }
 
       /* Animación del botón hamburguesa a X */
