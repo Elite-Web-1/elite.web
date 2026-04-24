@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite.web — Desarrollo web a medida</title>
+  <meta name="description" content="Desarrollador web freelance. Sitios a medida, aplicaciones y PWAs para emprendedores, marcas personales y pymes.">
+
+  <!-- Open Graph — cómo se ve cuando compartís el link en WhatsApp/redes -->
+  <meta property="og:title" content="Elite.web — Desarrollo web a medida">
+  <meta property="og:description" content="Sitios a medida para emprendedores, marcas personales y negocios que quieren una web a la altura de su identidad.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://eliteweb.com.ar">
+
+  <!-- Favicon simple con la inicial -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23fafafa%22 rx=%2220%22/><text x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2250%22 font-family=%22system-ui%22 font-weight=%22600%22 fill=%22%230a0a0a%22>E</text></svg>">
+
+  <!-- ====== FUENTES ====== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================
+       VARIABLES DE COLOR Y TIPOGRAFÍA
+       ========================================== */
+    :root {
+      --bg: #0a0a0a;
+      --bg-elev: #111111;
+      --bg-card: #141414;
+      --border: #1f1f1f;
+      --border-strong: #2a2a2a;
+      --text: #fafafa;
+      --text-muted: #888888;
+      --text-dim: #555555;
+      --accent: #fafafa;
+      --live: #4ade80;
+
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-body: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Geist Mono', 'Courier New', monospace;
+
+      --max-w: 1100px;
+    }
+
+    /* ========== RESET Y BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ::selection { background: var(--text); color: var(--bg); }
+
+    /* ========== UTILIDADES ========== */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+    }
+
+    /* ========== NAVEGACIÓN ========== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 0;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(10, 10, 10, 0.7);
+      border-bottom: 0.5px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+    nav.scrolled { border-bottom-color: var(--border); }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .logo img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+    }
+    .logo span { color: var(--text-dim); font-weight: 400; }
+    .nav-links { display: flex; gap: 2.25rem; list-style: none; }
+    .nav-links a { font-size: 13px; color: var(--text-muted); transition: color 0.2s ease; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      font-size: 13px;
+      padding: 8px 16px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    .nav-cta:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .menu-toggle { display: none; padding: 8px; font-size: 18px; }
+
+    /* ========== HERO ========== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 0 5rem;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--bg-elev);
+      border: 0.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      animation: fadeUp 0.7s ease-out;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--live);
+      box-shadow: 0 0 8px var(--live);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .hero h1 {
+      font-size: clamp(2.25rem, 6vw, 4.5rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      max-width: 900px;
+      animation: fadeUp 0.7s ease-out 0.1s backwards;
+    }
+    .hero h1 em {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    .hero p {
+      font-size: clamp(1rem, 1.5vw, 1.125rem);
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+      animation: fadeUp 0.7s ease-out 0.2s backwards;
+    }
+    .cta-group {
+      display: flex; gap: 0.75rem;
+      justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 0.7s ease-out 0.3s backwards;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; font-size: 14px; font-weight: 500;
+      border-radius: 8px; transition: all 0.25s ease; cursor: pointer;
+    }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(250, 250, 250, 0.15); }
+    .btn-secondary { background: transparent; color: var(--text); border: 0.5px solid var(--border-strong); }
+    .btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-elev); }
+    .btn .arrow { transition: transform 0.2s ease; }
+    .btn:hover .arrow { transform: translateX(3px); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ========== SECCIONES ========== */
+    section { padding: 7rem 0; position: relative; }
+    .section-header {
+      margin-bottom: 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 0.5px solid var(--border);
+      padding-bottom: 1.25rem;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    .section-title em {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .section-number {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* ========== SOBRE MÍ ========== */
+    .about { display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; }
+    .about-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      padding-top: 0.5rem;
+    }
+    .about-content p {
+      font-size: clamp(1.125rem, 1.8vw, 1.375rem);
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+    .about-content p:last-child {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* ========== PROYECTOS ========== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    .project-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .project-card:hover { border-color: var(--border-strong); transform: translateY(-4px); }
+    .project-image {
+      aspect-ratio: 16 / 10;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+      border-bottom: 0.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .project-image::before {
+      content: '';
+      width: 60%; height: 55%;
+      background: #1c1c1c;
+      border: 0.5px solid #252525;
+      border-radius: 6px;
+    }
+    .project-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.04), transparent 60%);
+    }
+    .project-image.has-image::before,
+    .project-image.has-image::after { display: none; }
+    .project-image img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: top left;
+      transition: transform 0.5s ease;
+    }
+    .project-card:hover .project-image img { transform: scale(1.05); }
+    .project-info {
+      padding: 1.25rem 1.25rem 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      gap: 8px;
+    }
+    .project-name { font-size: 1rem; font-weight: 500; letter-spacing: -0.01em; }
+    .project-year {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+    .project-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+      flex: 1;
+    }
+    .project-stack {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 0.5px solid var(--border);
+    }
+    .stack-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 3px 8px;
+      background: var(--bg-elev);
+      border: 0.5px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* ========== SERVICIOS ========== */
+    .services-list { display: flex; flex-direction: column; }
+    .service-item {
+      display: grid;
+      grid-template-columns: 60px 1fr auto;
+      gap: 2rem;
+      padding: 2rem 0;
+      border-bottom: 0.5px solid var(--border);
+      align-items: center;
+      transition: padding 0.3s ease;
+    }
+    .service-item:hover { padding-left: 1rem; }
+    .service-item:first-child { border-top: 0.5px solid var(--border); }
+    .service-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+    .service-content h3 {
+      font-size: 1.375rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.01em;
+    }
+    .service-content p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .service-price {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      text-align: right;
+    }
+    .service-price small {
+      color: var(--text-dim);
+      font-size: 10px;
+      text-transform: uppercase;
+      display: block;
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+
+    /* ========== PROCESO ========== */
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .process-step {
+      padding: 1.75rem;
+      background: var(--bg-elev);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .process-step:hover { border-color: var(--border-strong); background: var(--bg-card); }
+    .process-step-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+    .process-step h4 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    .process-step p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ========== CONTACTO ========== */
+    .contact { text-align: center; padding: 8rem 0; }
+    .contact .eyebrow { margin-bottom: 1.5rem; display: block; }
+    .contact h2 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+      line-height: 1.05;
+    }
+    .contact h2 em {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .contact-email {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border-strong);
+      transition: all 0.3s ease;
+      word-break: break-all;
+    }
+    .contact-email:hover { color: var(--text); border-bottom-color: var(--text); }
+    .contact-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .contact-link {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 10px 20px;
+      border: 0.5px solid var(--border);
+      border-radius: 100px;
+      transition: all 0.2s ease;
+    }
+    .contact-link:hover { color: var(--text); border-color: var(--text-muted); }
+
+    /* ========== FOOTER ========== */
+    footer { border-top: 0.5px solid var(--border); padding: 2.5rem 0; }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* ========== BOTÓN FLOTANTE WHATSAPP ========== */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 52px;
+      height: 52px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
+      transition: transform 0.3s ease;
+    }
+    .whatsapp-float:hover { transform: scale(1.08); }
+    .whatsapp-float svg { width: 26px; height: 26px; fill: white; }
+
+    /* ========== RESPONSIVE TABLET ========== */
+    @media (max-width: 900px) {
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ========== RESPONSIVE MÓVIL ========== */
+    @media (max-width: 640px) {
+      .container { padding: 0 1.25rem; }
+      .nav-links, .nav-cta { display: none; }
+      .menu-toggle { display: block; }
+      .hero { padding: 7rem 0 4rem; min-height: 85vh; }
+      section { padding: 5rem 0; }
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 2.5rem;
+      }
+      .about { grid-template-columns: 1fr; gap: 1.5rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .service-item {
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        padding: 1.5rem 0;
+      }
+      .service-price {
+        grid-column: 1 / -1;
+        padding-left: 40px;
+        text-align: left;
+        margin-top: 0.5rem;
+      }
+      .process-grid { grid-template-columns: 1fr; }
+      .contact-links { flex-direction: column; align-items: center; }
+      .cta-group { flex-direction: column; width: 100%; }
+      .cta-group .btn { justify-content: center; }
+      footer .container { flex-direction: column; text-align: center; }
+    }
+
+    /* ========== REVEAL ON SCROLL ========== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVEGACIÓN -->
+  <nav id="navbar">
+    <div class="container">
+      <a href="#" class="logo" id="navLogo" aria-label="Inicio">
+        <img src="img/Logo.png" style="display:block; width:36px; height:36px; object-fit:cover; border-radius:50%; filter:drop-shadow(0 0 8px rgba(59,130,246,0.5));">
+        <span class="brand-text"><em style="...">E l i t e</em><span id="navLogoName"> .web</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#trabajos">Trabajos</a></li>
+        <li><a href="#sobre-mi">Sobre mí</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#proceso">Proceso</a></li>
+      </ul>
+      <a href="#contacto" class="nav-cta">Contacto</a>
+      <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        Disponible para nuevos proyectos
+      </div>
+      <h1>
+        Desarrollo web con<br>
+        enfoque <em>personalizado</em>.
+      </h1>
+      <p>
+        <em>Tu escensia, llevada a la web</em>
+      </p>
+      <p>
+        Creo sitios a medida para emprendimientos, marcas personales y negocios que quieren una web a la altura de su identidad. Nada de plantillas recicladas.
+      </p>
+      <div class="cta-group">
+        <a href="#trabajos" class="btn btn-primary">
+          Ver proyectos <span class="arrow">→</span>
+        </a>
+        <a href="#contacto" class="btn btn-secondary">Contactame</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE MÍ -->
+  <section id="sobre-mi" class="reveal">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Sobre <em>mí</em></h2>
+        <span class="section-number">01 / 05</span>
+      </div>
+      <div class="about">
+        <div class="about-label">— Quién soy</div>
+        <div class="about-content">
+          <p>
+            Me presento, mi nombre es Mateo Benítez y me dedico al desarrollo de paginas web. Mi primer código lo escribí hace 4 años en la secundaria técnica de Muñiz, donde hoy estoy terminando mi formación en informática.
+          </p>
+          <p>
+            Entre proyectos escolares y trabajos personales —como la web que armé para el emprendimiento de pastelería de mi mamá— fui construyendo una forma de trabajar que se obsesiona con los detalles y la personalización. Cada proyecto arranca en blanco y se diseña pensado en la marca, el rubro y las personas a las que apunta. Trabajo con emprendedores, marcas personales y pymes que quieren una presencia online que los represente de verdad, sin pagar lo que cobra una agencia.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS -->
+  <section id="trabajos" class="reveal">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Trabajos <em>recientes</em></h2>
+        <span class="section-number">02 / 05</span>
+      </div>
+      <div class="projects-grid">
+
+        <!-- Proyecto 1 — Zuca -->
+        <article class="project-card">
+          <div class="project-image has-image">
+            <img src="img/zuca.png" alt="Captura de la aplicación Zuca mostrando la pantalla de ingredientes">
+          </div>
+          <div class="project-info">
+            <div class="project-meta">
+              <h3 class="project-name">Zuca Pastelería</h3>
+              <span class="project-year">2026</span>
+            </div>
+            <p class="project-desc">
+              Aplicación instalable para un emprendimiento de pastelería artesanal. Gestiona ingredientes, recetas y combos, y calcula automáticamente el precio de venta de cada producto. Reemplazó un proceso manual que tomaba horas por semana.
+            </p>
+            <div class="project-stack">
+              <span class="stack-tag">PWA</span>
+              <span class="stack-tag">JavaScript</span>
+              <span class="stack-tag">HTML/CSS</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Proyecto 2 — Mini Mercado -->
+        <article class="project-card">
+          <div class="project-image has-image">
+            <img src="img/mini-mercado.png" alt="Captura del sistema Mini Mercado mostrando el panel general">
+          </div>
+          <div class="project-info">
+            <div class="project-meta">
+              <h3 class="project-name">Mini Mercado</h3>
+              <span class="project-year">2025</span>
+            </div>
+            <p class="project-desc">
+              Sistema de control de stock para comercios. Registro de productos, movimientos de inventario, generación de códigos de barras y exportación a Excel y PDF. Pensado para reemplazar planillas de cálculo en operaciones de volumen medio.
+            </p>
+            <div class="project-stack">
+              <span class="stack-tag">JavaScript</span>
+              <span class="stack-tag">Chart.js</span>
+              <span class="stack-tag">PWA</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Proyecto 3 — Coordinación operativa -->
+        <article class="project-card">
+          <div class="project-image">
+            <!-- Cuando tengas captura: agregá la clase "has-image" al div y descomentá la línea de abajo -->
+            <!-- <img src="img/coordinacion.png" alt="Sistema de coordinación operativa"> -->
+          </div>
+          <div class="project-info">
+            <div class="project-meta">
+              <h3 class="project-name">Coordinación operativa</h3>
+              <span class="project-year">2025</span>
+            </div>
+            <p class="project-desc">
+              Plataforma desarrollada para una empresa del sector aeronáutico que necesitaba coordinar tareas secuenciales entre empleados. Cada trabajador marca inicio y fin de su tarea con un check-in y el equipo ve la lista compartida actualizarse en tiempo real.
+            </p>
+            <div class="project-stack">
+              <span class="stack-tag">PHP</span>
+              <span class="stack-tag">MySQL</span>
+              <span class="stack-tag">JavaScript</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section id="servicios" class="reveal">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Qué <em>ofrezco</em></h2>
+        <span class="section-number">03 / 05</span>
+      </div>
+      <div class="services-list">
+
+        <div class="service-item">
+          <span class="service-num">01</span>
+          <div class="service-content">
+            <h3>Landing page</h3>
+            <p>Página de una sola pantalla ideal para promocionar un producto, servicio o captar contactos.</p>
+          </div>
+          <div class="service-price">
+            Entrega: 1-2 semanas
+            <small>Consultar precio</small>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <span class="service-num">02</span>
+          <div class="service-content">
+            <h3>Sitio web completo</h3>
+            <p>Multi-sección con home, servicios, contacto y todo lo necesario para una presencia profesional.</p>
+          </div>
+          <div class="service-price">
+            Entrega: 2-3 semanas
+            <small>Consultar precio</small>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <span class="service-num">03</span>
+          <div class="service-content">
+            <h3>Tienda online</h3>
+            <p>E-commerce con carrito, pagos, gestión de productos y panel para que puedas administrar todo vos mismo.</p>
+          </div>
+          <div class="service-price">
+            Entrega: 3-5 semanas
+            <small>Consultar precio</small>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <span class="service-num">04</span>
+          <div class="service-content">
+            <h3>Aplicación web a medida</h3>
+            <p>Herramientas internas, sistemas de gestión, calculadoras o lo que tu negocio necesite resolver.</p>
+          </div>
+          <div class="service-price">
+            A cotizar
+            <small>Según complejidad</small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section id="proceso" class="reveal">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Cómo <em>trabajo</em></h2>
+        <span class="section-number">04 / 05</span>
+      </div>
+      <div class="process-grid">
+
+        <div class="process-step">
+          <span class="process-step-num">01 — Conversación</span>
+          <h4>Charlamos sobre tu negocio</h4>
+          <p>Por WhatsApp o llamada. Me contás qué problema querés resolver, cómo imaginás el sitio y qué negocios de referencia te gustan.</p>
+        </div>
+
+        <div class="process-step">
+          <span class="process-step-num">02 — Propuesta</span>
+          <h4>Te paso el plan y el presupuesto</h4>
+          <p>Con el alcance definido, te mando una cotización clara: qué incluye, tiempos de entrega y forma de pago. Arrancamos con un 40% de adelanto.</p>
+        </div>
+
+        <div class="process-step">
+          <span class="process-step-num">03 — Desarrollo</span>
+          <h4>Construyo tu sitio a medida</h4>
+          <p>Uso los colores, la tipografía y la identidad de tu negocio. Código limpio, rápido y adaptado a celulares. Incluye 2 rondas de cambios sin costo.</p>
+        </div>
+
+        <div class="process-step">
+          <span class="process-step-num">04 — Entrega</span>
+          <h4>Deploy, capacitación y soporte</h4>
+          <p>Publico el sitio online, te muestro cómo editarlo y te dejo una guía de uso. Garantía de 2 meses por bugs, sin cargo.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="contact reveal">
+    <div class="container">
+      <span class="eyebrow">— Trabajemos juntos</span>
+      <h2>
+        ¿Tenés un <em>proyecto</em><br>en mente?
+      </h2>
+      <a href="mailto:benitez.mateo.trabajo@gmail.com" class="contact-email">
+        benitez.mateo.trabajo@gmail.com
+      </a>
+      <div class="contact-links">
+        <a href="https://wa.me/5491160172754?text=Hola%20Mateo!%20Vi%20tu%20portfolio%20y%20me%20gustar%C3%ADa%20consultarte%20por%20un%20proyecto" class="contact-link" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="mailto:benitez.mateo.trabajo@gmail.com" class="contact-link">Email</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <span class="footer-text">© 2026 Elite.web</span>
+      <span class="footer-text">Hecho con código propio ✶</span>
+    </div>
+  </footer>
+
+  <!-- BOTÓN FLOTANTE WHATSAPP -->
+  <a href="https://wa.me/5491160172754?text=Hola%20Mateo!%20Vi%20tu%20portfolio%20y%20me%20gustar%C3%ADa%20consultarte%20por%20un%20proyecto"
+     class="whatsapp-float"
+     target="_blank"
+     rel="noopener"
+     aria-label="Contactar por WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+
+  <script>
+    // Navegación con borde al scrollear
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    });
+
+    // Fade-in al hacer scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
