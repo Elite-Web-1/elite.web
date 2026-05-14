@@ -620,6 +620,199 @@
       letter-spacing: 0.3px;
       color: rgba(255,255,255,0.68);
     }
+
+    /* ========== RESEÑAS ========== */
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 4rem;
+    }
+    .review-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.3s ease;
+    }
+    .review-card:hover { border-color: var(--border-strong); }
+    .review-stars {
+      display: flex;
+      gap: 2px;
+      font-size: 14px;
+      color: #f5c518;
+      letter-spacing: 1px;
+    }
+    .review-stars .star-empty { color: var(--border-strong); }
+    .review-comment {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.55;
+      letter-spacing: -0.005em;
+    }
+    .review-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 0.5px solid var(--border);
+    }
+    .review-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .review-date {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+    .reviews-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 2.5rem 0;
+      color: var(--text-dim);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+
+    .review-form-wrapper {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 2.5rem;
+      background: var(--bg-elev);
+      border: 0.5px solid var(--border);
+      border-radius: 14px;
+    }
+    .review-form-wrapper h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.35rem;
+    }
+    .review-form-wrapper .form-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 1.75rem;
+    }
+    .review-form { display: flex; flex-direction: column; gap: 1rem; }
+    .review-form input,
+    .review-form textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.2s ease;
+      resize: vertical;
+    }
+    .review-form input:focus,
+    .review-form textarea:focus {
+      outline: none;
+      border-color: var(--text-muted);
+    }
+    .review-form input::placeholder,
+    .review-form textarea::placeholder { color: var(--text-dim); }
+
+    .stars-input {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .stars-input .star-btn {
+      font-size: 26px;
+      line-height: 1;
+      color: var(--border-strong);
+      transition: color 0.15s ease, transform 0.15s ease;
+      padding: 2px;
+    }
+    .stars-input .star-btn:hover { transform: scale(1.1); }
+    .stars-input .star-btn.active { color: #f5c518; }
+    .stars-input-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-left: 0.75rem;
+    }
+
+    .form-status {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      min-height: 1em;
+    }
+    .form-status.success { color: var(--live); }
+    .form-status.error { color: #ef4444; }
+
+    .review-form button[type="submit"] {
+      align-self: flex-start;
+    }
+    .review-form button[type="submit"]:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ========== FAQ ========== */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      border-top: 0.5px solid var(--border);
+    }
+    .faq-item {
+      border-bottom: 0.5px solid var(--border);
+      padding: 1.5rem 0;
+      transition: padding 0.3s ease;
+    }
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 1.125rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: '+';
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+    .faq-item[open] summary::after { transform: rotate(45deg); }
+    .faq-item p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-top: 0.85rem;
+      max-width: 760px;
+    }
+
+    /* ========== RESPONSIVE — RESEÑAS Y FAQ ========== */
+    @media (max-width: 900px) {
+      .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .reviews-grid { grid-template-columns: 1fr; }
+      .review-form-wrapper { padding: 1.75rem 1.25rem; }
+      .faq-item summary { font-size: 1rem; gap: 1rem; }
+    }
   </style>
 </head>
 <body>
@@ -636,6 +829,8 @@
         <li><a href="#trabajos">Trabajos</a></li>
         <li><a href="#servicios">Servicios</a></li>
         <li><a href="#proceso">Proceso</a></li>
+        <li><a href="#resenas">Reseñas</a></li>
+        <li><a href="#faq">FAQ</a></li>
       </ul>
       <a href="#contacto" class="nav-cta">Contacto</a>
       <button class="menu-toggle" aria-label="Abrir menú">☰</button>
@@ -673,7 +868,7 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title">Sobre <em>mí</em></h2>
-        <span class="section-number">01 / 04</span>
+        <span class="section-number">01 / 06</span>
       </div>
       <div class="about">
         <div class="about-label">— Quién soy</div>
@@ -694,7 +889,7 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title">Trabajos <em>recientes</em></h2>
-        <span class="section-number">02 / 04</span>
+        <span class="section-number">02 / 06</span>
       </div>
       <div class="projects-grid">
 
@@ -770,7 +965,7 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title">Qué <em>ofrezco</em></h2>
-        <span class="section-number">03 / 04</span>
+        <span class="section-number">03 / 06</span>
       </div>
       <div class="services-list">
 
@@ -837,7 +1032,7 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title">Cómo <em>trabajo</em></h2>
-        <span class="section-number">04 / 04</span>
+        <span class="section-number">04 / 06</span>
       </div>
       <div class="process-grid">
 
@@ -865,6 +1060,116 @@
           <p>Publico el sitio online, te muestro cómo editarlo y te dejo una guía de uso. Garantía de 2 meses por bugs, sin cargo.</p>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEÑAS -->
+  <section id="resenas" class="reveal">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Lo que <em>dicen</em></h2>
+        <span class="section-number">05 / 06</span>
+      </div>
+
+      <div class="reviews-grid" id="reviewsList">
+
+        <!-- ============================================
+             RESEÑAS PUBLICADAS
+             Para agregar una reseña nueva, copiá el bloque
+             <article class="review-card">...</article>
+             y reemplazá los valores: estrellas (★ = llena, ☆ = vacía),
+             comentario, nombre y fecha.
+             ============================================ -->
+
+        <!-- Ejemplo de bloque a copiar:
+
+        <article class="review-card">
+          <div class="review-stars">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <p class="review-comment">Mateo entendió perfecto lo que necesitaba y el resultado superó mis expectativas. La web quedó rapidísima y se ve increíble en el celular.</p>
+          <div class="review-meta">
+            <span class="review-name">Nombre Apellido</span>
+            <span class="review-date">May 2026</span>
+          </div>
+        </article>
+
+        -->
+
+        <div class="reviews-empty">Pronto se sumarán las primeras reseñas. ¿Querés ser la primera persona en dejar la tuya?</div>
+      </div>
+
+      <div class="review-form-wrapper">
+        <h3>Dejá tu reseña</h3>
+        <p class="form-subtitle">Tu opinión me llega directo por WhatsApp y, una vez confirmada, la sumo a esta sección.</p>
+        <form id="reviewForm" class="review-form" novalidate>
+          <input type="text" name="name" id="reviewName" maxlength="60" required placeholder="Tu nombre" autocomplete="name">
+
+          <div class="stars-input" id="starsInput" role="radiogroup" aria-label="Calificación">
+            <button type="button" class="star-btn" data-value="1" aria-label="1 estrella">★</button>
+            <button type="button" class="star-btn" data-value="2" aria-label="2 estrellas">★</button>
+            <button type="button" class="star-btn" data-value="3" aria-label="3 estrellas">★</button>
+            <button type="button" class="star-btn" data-value="4" aria-label="4 estrellas">★</button>
+            <button type="button" class="star-btn" data-value="5" aria-label="5 estrellas">★</button>
+            <span class="stars-input-label" id="starsLabel">Elegí una puntuación</span>
+          </div>
+
+          <textarea name="comment" id="reviewComment" rows="4" maxlength="500" required placeholder="Contanos cómo fue tu experiencia…"></textarea>
+
+          <button type="submit" class="btn btn-primary" id="reviewSubmit">
+            Enviar por WhatsApp <span class="arrow">→</span>
+          </button>
+
+          <p class="form-status" id="formStatus" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="reveal">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Preguntas <em>frecuentes</em></h2>
+        <span class="section-number">06 / 06</span>
+      </div>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>¿Cuánto tarda en estar lista mi web?</summary>
+          <p>Depende del tipo de proyecto. Una landing page suele entregarse en 1 a 2 semanas, un sitio completo entre 3 y 4 semanas, y una tienda online o aplicación a medida puede llevar entre 4 y 8 semanas. Los tiempos exactos los acordamos antes de arrancar.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Qué incluye el precio?</summary>
+          <p>Diseño y desarrollo a medida, código optimizado, versión responsive (celular y tablet), formulario de contacto, integración con WhatsApp, 2 rondas de cambios sin costo, deploy del sitio y una capacitación para que puedas administrarlo. Dominio y hosting se cotizan aparte porque son servicios externos.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Necesito tener dominio y hosting?</summary>
+          <p>No hace falta que los tengas previamente. Te asesoro en la compra del dominio (.com, .com.ar, etc.) y te recomiendo el hosting que mejor se adapte a tu proyecto. Si ya los tenés, también trabajo sobre los servicios que ya estés usando.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Puedo editar la web después de entregada?</summary>
+          <p>Sí. Al final del proyecto te dejo una guía de uso y te capacito para que puedas modificar textos, imágenes y precios por tu cuenta. Si necesitás cambios más grandes, los podemos coordinar a parte sin problema.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Cómo es la forma de pago?</summary>
+          <p>Trabajamos con un 40% de adelanto para reservar el lugar y arrancar el proyecto, y el 60% restante al momento de la entrega. Acepto transferencia bancaria y MercadoPago. Si el proyecto es grande, podemos dividir el pago final en cuotas.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Trabajás con clientes fuera de Argentina?</summary>
+          <p>Sí. Trabajo de forma 100% remota y ya tuve proyectos con clientes de otros países. La comunicación la manejamos por WhatsApp, email o videollamada según te resulte más cómodo, y los pagos internacionales los coordinamos por transferencia o plataformas como Wise.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Qué pasa si encuentro un error después de la entrega?</summary>
+          <p>Todo proyecto incluye 2 meses de garantía sin cargo por bugs o errores técnicos. Si aparece algo durante ese período, lo soluciono sin costo extra. Después de la garantía, podemos arreglar un plan de soporte mensual si lo necesitás.</p>
+        </details>
       </div>
     </div>
   </section>
@@ -942,6 +1247,75 @@
         menuToggle.classList.remove('open');
         menuToggle.innerHTML = '☰';
       });
+    });
+
+    // ============================================
+    // RESEÑAS — Selector de estrellas + envío por WhatsApp
+    // ============================================
+    const WHATSAPP_NUMBER = '5491160172754';
+
+    const starsInput = document.getElementById('starsInput');
+    const starsLabel = document.getElementById('starsLabel');
+    const starButtons = starsInput.querySelectorAll('.star-btn');
+    const reviewForm = document.getElementById('reviewForm');
+    const formStatus = document.getElementById('formStatus');
+    let currentRating = 0;
+
+    const ratingLabels = {
+      0: 'Elegí una puntuación',
+      1: 'Muy mala',
+      2: 'Regular',
+      3: 'Buena',
+      4: 'Muy buena',
+      5: 'Excelente'
+    };
+
+    function paintStars(value) {
+      starButtons.forEach(btn => {
+        const v = Number(btn.dataset.value);
+        btn.classList.toggle('active', v <= value);
+      });
+      starsLabel.textContent = ratingLabels[value];
+    }
+
+    starButtons.forEach(btn => {
+      btn.addEventListener('mouseenter', () => paintStars(Number(btn.dataset.value)));
+      btn.addEventListener('click', () => {
+        currentRating = Number(btn.dataset.value);
+        paintStars(currentRating);
+      });
+    });
+    starsInput.addEventListener('mouseleave', () => paintStars(currentRating));
+
+    reviewForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      formStatus.className = 'form-status';
+      formStatus.textContent = '';
+
+      const name = document.getElementById('reviewName').value.trim();
+      const comment = document.getElementById('reviewComment').value.trim();
+
+      if (!name || !comment || currentRating === 0) {
+        formStatus.classList.add('error');
+        formStatus.textContent = 'Completá tu nombre, una puntuación y un comentario.';
+        return;
+      }
+
+      const stars = '★'.repeat(currentRating) + '☆'.repeat(5 - currentRating);
+      const message =
+        `Hola Mateo! Te dejo mi reseña para Elite.web:\n\n` +
+        `Nombre: ${name}\n` +
+        `Puntuación: ${stars} (${currentRating}/5)\n` +
+        `Comentario: ${comment}`;
+
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank', 'noopener');
+
+      formStatus.classList.add('success');
+      formStatus.textContent = '¡Gracias! Se abrió WhatsApp para enviar tu reseña.';
+      reviewForm.reset();
+      currentRating = 0;
+      paintStars(0);
     });
   </script>
 
