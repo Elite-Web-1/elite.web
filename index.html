@@ -795,13 +795,29 @@
       transition: transform 0.3s ease;
       flex-shrink: 0;
     }
-    .faq-item[open] summary::after { transform: rotate(45deg); }
+    .faq-item summary::after { transition: transform 0.35s ease, color 0.2s ease; }
+    .faq-item[open] summary::after { transform: rotate(45deg); color: var(--text); }
+    .faq-item summary:hover { color: var(--text-muted); }
+    .faq-item summary:hover::after { color: var(--text); }
     .faq-item p {
       font-size: 0.95rem;
       color: var(--text-muted);
       line-height: 1.65;
       margin-top: 0.85rem;
       max-width: 760px;
+    }
+    .faq-item[open] p {
+      animation: faqReveal 0.4s ease forwards;
+    }
+    @keyframes faqReveal {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* ========== RESPONSIVE — RESEÑAS Y FAQ ========== */
@@ -830,7 +846,7 @@
         <li><a href="#servicios">Servicios</a></li>
         <li><a href="#proceso">Proceso</a></li>
         <li><a href="#resenas">Reseñas</a></li>
-        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#faq">Preguntas frecuentes</a></li>
       </ul>
       <a href="#contacto" class="nav-cta">Contacto</a>
       <button class="menu-toggle" aria-label="Abrir menú">☰</button>
@@ -1012,7 +1028,7 @@
             <p>Herramientas internas, sistemas de gestión, calculadoras o lo que tu negocio necesite resolver.</p>
           </div>
           <div class="service-price">
-            A cotizar
+            Entrega: Segun complejidad
             <small>A partir de $600k</small>
           </div>
         </div>
@@ -1158,12 +1174,7 @@
 
         <details class="faq-item">
           <summary>¿Cómo es la forma de pago?</summary>
-          <p>Trabajamos con un 40% de adelanto para reservar el lugar y arrancar el proyecto, y el 60% restante al momento de la entrega. Acepto transferencia bancaria y MercadoPago. Si el proyecto es grande, podemos dividir el pago final en cuotas.</p>
-        </details>
-
-        <details class="faq-item">
-          <summary>¿Trabajás con clientes fuera de Argentina?</summary>
-          <p>Sí. Trabajo de forma 100% remota y ya tuve proyectos con clientes de otros países. La comunicación la manejamos por WhatsApp, email o videollamada según te resulte más cómodo, y los pagos internacionales los coordinamos por transferencia o plataformas como Wise.</p>
+          <p>Trabajamos con un 40% de adelanto para reservar el lugar y arrancar el proyecto, y el 60% restante al momento de la entrega. Acepto transferencia por MercadoPago. Si el proyecto es grande, podemos dividir el pago final en cuotas.</p>
         </details>
 
         <details class="faq-item">
