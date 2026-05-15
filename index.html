@@ -855,22 +855,45 @@
       display: flex;
       opacity: 1;
     }
-    .lightbox-figure {
-      margin: 0;
-      max-width: min(1100px, 100%);
+    .lightbox-stage {
+      width: min(1100px, 100%);
       max-height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.85rem;
     }
-    .lightbox-img {
+    .lightbox-viewport {
+      width: 100%;
+      height: calc(100vh - 9rem);
+      overflow: hidden;
+    }
+    .lightbox-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      will-change: transform;
+    }
+    .lightbox-track.animating {
+      transition: transform 0.75s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .lightbox-slide {
+      flex: 0 0 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 0.25rem;
+      box-sizing: border-box;
+    }
+    .lightbox-slide img {
       max-width: 100%;
-      max-height: calc(100vh - 9rem);
+      max-height: 100%;
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
       user-select: none;
+      -webkit-user-drag: none;
       display: block;
     }
     .lightbox-counter {
@@ -878,6 +901,10 @@
       font-size: 11px;
       color: var(--text-dim);
       letter-spacing: 0.08em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .lightbox-track.animating { transition: none; }
     }
     .lightbox-btn {
       position: absolute;
@@ -1344,10 +1371,12 @@
     <button type="button" class="lightbox-btn lightbox-close" id="lightboxClose" aria-label="Cerrar">✕</button>
     <button type="button" class="lightbox-btn lightbox-prev" id="lightboxPrev" aria-label="Imagen anterior">‹</button>
     <button type="button" class="lightbox-btn lightbox-next" id="lightboxNext" aria-label="Imagen siguiente">›</button>
-    <figure class="lightbox-figure">
-      <img class="lightbox-img" id="lightboxImg" alt="">
-      <figcaption class="lightbox-counter" id="lightboxCounter"></figcaption>
-    </figure>
+    <div class="lightbox-stage">
+      <div class="lightbox-viewport">
+        <div class="lightbox-track" id="lightboxTrack"></div>
+      </div>
+      <div class="lightbox-counter" id="lightboxCounter" aria-live="polite"></div>
+    </div>
   </div>
 
   <script>
@@ -1464,40 +1493,126 @@
     (() => {
       const lightbox = document.getElementById('lightbox');
       if (!lightbox) return;
-      const imgEl = document.getElementById('lightboxImg');
+      const trackEl = document.getElementById('lightboxTrack');
       const counterEl = document.getElementById('lightboxCounter');
       const btnPrev = document.getElementById('lightboxPrev');
       const btnNext = document.getElementById('lightboxNext');
       const btnClose = document.getElementById('lightboxClose');
 
-      let images = [];
-      let index = 0;
+      const AUTOPLAY_MS = 4000;
+      const RESUME_DELAY_MS = 6000;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let realCount = 0;
+      let pos = 0;
+      let isTransitioning = false;
+      let autoplayTimer = null;
+      let resumeTimer = null;
       let lastTrigger = null;
 
-      function render(i) {
-        if (!images.length) return;
-        index = (i + images.length) % images.length;
-        imgEl.src = images[index];
-        imgEl.alt = `Imagen ${index + 1} de ${images.length}`;
-        counterEl.textContent = `${index + 1} / ${images.length}`;
+      function setTrack(p, animate) {
+        trackEl.classList.toggle('animating', !!animate);
+        trackEl.style.transform = `translateX(-${p * 100}%)`;
+      }
+
+      function makeSlide(src, n, total) {
+        const slide = document.createElement('div');
+        slide.className = 'lightbox-slide';
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = `Imagen ${n} de ${total}`;
+        img.draggable = false;
+        slide.appendChild(img);
+        return slide;
+      }
+
+      function buildTrack(srcList) {
+        trackEl.innerHTML = '';
+        realCount = srcList.length;
+        if (realCount === 0) return;
+        if (realCount === 1) {
+          trackEl.appendChild(makeSlide(srcList[0], 1, 1));
+          pos = 0;
+          setTrack(0, false);
+          return;
+        }
+        // Clon del último al inicio + reales + clon del primero al final → loop sin saltos
+        trackEl.appendChild(makeSlide(srcList[realCount - 1], realCount, realCount));
+        srcList.forEach((src, i) => trackEl.appendChild(makeSlide(src, i + 1, realCount)));
+        trackEl.appendChild(makeSlide(srcList[0], 1, realCount));
+        pos = 1;
+        setTrack(pos, false);
+      }
+
+      function updateCounter() {
+        if (realCount <= 1) { counterEl.textContent = ''; return; }
+        let realIndex;
+        if (pos === 0) realIndex = realCount - 1;
+        else if (pos === realCount + 1) realIndex = 0;
+        else realIndex = pos - 1;
+        counterEl.textContent = `${realIndex + 1} / ${realCount}`;
+      }
+
+      function go(delta) {
+        if (realCount <= 1 || isTransitioning) return;
+        isTransitioning = true;
+        pos += delta;
+        setTrack(pos, true);
+        updateCounter();
+      }
+
+      trackEl.addEventListener('transitionend', (e) => {
+        if (e.propertyName !== 'transform') return;
+        isTransitioning = false;
+        if (pos === 0) {
+          pos = realCount;
+          setTrack(pos, false);
+        } else if (pos === realCount + 1) {
+          pos = 1;
+          setTrack(pos, false);
+        }
+      });
+
+      function startAutoplay() {
+        stopAutoplay();
+        if (realCount <= 1 || prefersReducedMotion) return;
+        autoplayTimer = setInterval(() => go(1), AUTOPLAY_MS);
+      }
+
+      function stopAutoplay() {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null;
+      }
+
+      function pauseThenResume() {
+        stopAutoplay();
+        clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(() => {
+          if (lightbox.classList.contains('open')) startAutoplay();
+        }, RESUME_DELAY_MS);
       }
 
       function openGallery(name, count, fallback) {
+        let srcs = [];
         if (count > 0) {
-          images = Array.from({ length: count }, (_, i) => `img/${name}${i + 1}.png`);
+          srcs = Array.from({ length: count }, (_, i) => `img/${name}${i + 1}.png`);
           lightbox.dataset.single = 'false';
-        } else {
-          images = fallback ? [fallback] : [];
+        } else if (fallback) {
+          srcs = [fallback];
           lightbox.dataset.single = 'true';
         }
-        if (!images.length) return;
-        render(0);
+        if (!srcs.length) return;
+        buildTrack(srcs);
+        updateCounter();
         lightbox.classList.add('open');
         lightbox.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
+        startAutoplay();
       }
 
       function close() {
+        stopAutoplay();
+        clearTimeout(resumeTimer);
         lightbox.classList.remove('open');
         lightbox.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
@@ -1521,18 +1636,37 @@
         });
       });
 
-      btnPrev.addEventListener('click', () => render(index - 1));
-      btnNext.addEventListener('click', () => render(index + 1));
+      btnPrev.addEventListener('click', () => { go(-1); pauseThenResume(); });
+      btnNext.addEventListener('click', () => { go(1); pauseThenResume(); });
       btnClose.addEventListener('click', close);
-      lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) close();
+      lightbox.addEventListener('click', (e) => { if (e.target === lightbox) close(); });
+      lightbox.addEventListener('mouseenter', stopAutoplay);
+      lightbox.addEventListener('mouseleave', () => {
+        if (lightbox.classList.contains('open')) startAutoplay();
       });
       document.addEventListener('keydown', (e) => {
         if (!lightbox.classList.contains('open')) return;
         if (e.key === 'Escape') close();
-        else if (e.key === 'ArrowLeft' && lightbox.dataset.single !== 'true') render(index - 1);
-        else if (e.key === 'ArrowRight' && lightbox.dataset.single !== 'true') render(index + 1);
+        else if (e.key === 'ArrowLeft') { go(-1); pauseThenResume(); }
+        else if (e.key === 'ArrowRight') { go(1); pauseThenResume(); }
       });
+
+      // Precarga de todas las imágenes de las galerías en idle, para abrir al instante
+      const preload = () => {
+        document.querySelectorAll('.project-image[data-gallery]').forEach(el => {
+          const name = el.dataset.gallery;
+          const count = Number(el.dataset.count) || 0;
+          for (let i = 1; i <= count; i++) {
+            const img = new Image();
+            img.src = `img/${name}${i}.png`;
+          }
+        });
+      };
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(preload, { timeout: 2000 });
+      } else {
+        window.addEventListener('load', () => setTimeout(preload, 800));
+      }
     })();
   </script>
 
