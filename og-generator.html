@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador OG — Elite.web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 40px 20px;
+      font-family: 'Geist', system-ui, sans-serif;
+      color: #fafafa;
+    }
+    .instructions {
+      max-width: 700px;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 20px 24px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .instructions h2 { margin: 0 0 12px; font-size: 16px; }
+    .instructions ol { margin: 0; padding-left: 20px; }
+    .instructions code {
+      background: #222;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+    }
+    button {
+      background: #fafafa;
+      color: #0a0a0a;
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button:hover { transform: translateY(-1px); }
+
+    /* La imagen OG: exactamente 1200x630 */
+    .og-card {
+      width: 1200px;
+      height: 630px;
+      background: #0a0a0a;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 50px 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .og-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(80,120,255,0.08), transparent 60%);
+      pointer-events: none;
+    }
+    .og-logo {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+    }
+    .og-brand {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 96px;
+      line-height: 1;
+      color: #fafafa;
+      letter-spacing: -0.02em;
+      position: relative;
+      z-index: 1;
+      margin: 0;
+    }
+    .og-tagline {
+      font-family: 'Geist', sans-serif;
+      font-size: 28px;
+      font-weight: 400;
+      color: #b8b8b8;
+      letter-spacing: 0.01em;
+      position: relative;
+      z-index: 1;
+      margin: 0;
+    }
+
+    /* Para vista previa cabe escalado */
+    .preview-wrap {
+      max-width: 100%;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="instructions">
+    <h2>Generador de og-image.png — Elite.web</h2>
+    <ol>
+      <li>Esperá un segundo a que se carguen las fuentes y el logo.</li>
+      <li>Hacé click en <strong>Descargar PNG (1200×630)</strong>.</li>
+      <li>Se descargará un archivo llamado <code>og-image.png</code>.</li>
+      <li>Movelo a la carpeta <code>img/</code> del proyecto.</li>
+      <li>Listo — los meta tags ya apuntan a <code>img/og-image.png</code>.</li>
+    </ol>
+  </div>
+
+  <button id="downloadBtn">Descargar PNG (1200×630)</button>
+
+  <div class="preview-wrap">
+    <div class="og-card" id="ogCard">
+      <img src="img/Logo.png" alt="" class="og-logo" id="ogLogo">
+      <h1 class="og-brand">Elite.web</h1>
+      <p class="og-tagline">Desarrollo web a medida</p>
+    </div>
+  </div>
+
+  <script>
+    // Convierte el div OG a PNG usando un canvas dibujado a mano (sin libs externas).
+    // Esto evita issues de CORS de html2canvas.
+    const btn = document.getElementById('downloadBtn');
+    const logoEl = document.getElementById('ogLogo');
+
+    function whenLogoReady() {
+      return new Promise((resolve) => {
+        // Si ya terminó de cargar (con éxito o con error), resolvemos al toque
+        if (logoEl.complete) return resolve();
+        const done = () => resolve();
+        logoEl.addEventListener('load', done, { once: true });
+        logoEl.addEventListener('error', done, { once: true });
+        // Salvavidas: si por algún motivo no dispara ningún evento en 3s, seguimos
+        setTimeout(done, 3000);
+      });
+    }
+
+    async function whenFontsReady() {
+      if (document.fonts && document.fonts.ready) {
+        try { await document.fonts.ready; } catch (e) {}
+      }
+    }
+
+    function drawCanvas(includeLogo) {
+      const W = 1200, H = 630;
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // Fondo base
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, W, H);
+
+      // Grilla sutil
+      ctx.strokeStyle = 'rgba(255,255,255,0.018)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 50) {
+        ctx.beginPath();
+        ctx.moveTo(x + 0.5, 0);
+        ctx.lineTo(x + 0.5, H);
+        ctx.stroke();
+      }
+      for (let y = 0; y < H; y += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, y + 0.5);
+        ctx.lineTo(W, y + 0.5);
+        ctx.stroke();
+      }
+
+      // Glow radial
+      const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, 500);
+      grad.addColorStop(0, 'rgba(80,120,255,0.10)');
+      grad.addColorStop(1, 'rgba(80,120,255,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Logo (opcional)
+      let logoDrawn = false;
+      if (includeLogo && logoEl.naturalWidth > 0) {
+        const logoSize = 180;
+        const logoX = (W - logoSize) / 2;
+        const logoY = 130;
+        try {
+          ctx.drawImage(logoEl, logoX, logoY, logoSize, logoSize);
+          logoDrawn = true;
+        } catch (e) {
+          console.warn('No se pudo dibujar el logo:', e);
+        }
+      }
+
+      // Marca
+      ctx.fillStyle = '#fafafa';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.font = '400 96px "Instrument Serif", Georgia, serif';
+      ctx.fillText('Elite.web', W/2, logoDrawn ? 420 : 340);
+
+      // Tagline
+      ctx.fillStyle = '#b8b8b8';
+      ctx.font = '400 28px "Geist", system-ui, sans-serif';
+      ctx.fillText('Desarrollo web a medida', W/2, logoDrawn ? 478 : 398);
+
+      return { canvas, logoDrawn };
+    }
+
+    function tryDownload(canvas) {
+      const dataUrl = canvas.toDataURL('image/png'); // puede throw si está tainted
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'og-image.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.textContent = 'Generando…';
+      await whenFontsReady();
+      await whenLogoReady();
+
+      // Intento 1: con logo
+      let { canvas } = drawCanvas(true);
+      try {
+        tryDownload(canvas);
+      } catch (e) {
+        // Si el canvas quedó tainted por el logo en file://, redibujo sin logo
+        console.warn('Canvas tainted, regenerando sin logo:', e);
+        const result = drawCanvas(false);
+        try {
+          tryDownload(result.canvas);
+          alert('Se descargó el PNG SIN el logo (Chrome bloquea cargar imágenes locales en canvas).\n\nSi querés la versión con logo:\n• Servilo con Live Server (VS Code) o cualquier servidor local, o\n• Pegale el logo encima en cualquier editor de imágenes.');
+        } catch (e2) {
+          alert('No se pudo exportar el PNG.\n\nProbá abriendo este archivo con un servidor local (Live Server de VS Code, por ejemplo) en lugar de doble click.');
+        }
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Descargar PNG (1200×630)';
+    });
+  </script>
+</body>
+</html>
