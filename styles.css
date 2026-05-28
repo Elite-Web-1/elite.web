@@ -1,0 +1,448 @@
+/* ─────────────────────────────────────────────────────────────
+   Elite — Loading screen overlay
+   Sits on top of the portfolio during the cinematic intro.
+   Driven entirely by data-* attributes on <body>:
+     data-phase: waiting | loading | logo-hold | transitioning | hero
+     data-logo-visible / data-logo-corner / data-skip-visible
+   All selectors are namespaced (intro-*, .rose-*, .enter-*, etc.)
+   so nothing collides with the portfolio's own CSS.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Body scroll lock during the intro ───────────────────── */
+/* `dvh` (dynamic viewport height) responds to mobile browser
+   chrome appearing/disappearing — `100vh` on iOS/Android Chrome
+   includes the URL bar's area even when it's hidden, leaving the
+   content cropped at the bottom. dvh tracks the actual visible
+   viewport. Falls back to vh on browsers that don't support it. */
+body:not([data-phase="hero"]) {
+  overflow: hidden !important;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ── Reduced-motion global kill switch ─────────────────────
+   Users who explicitly asked for less motion get a frozen page —
+   transitions collapse to ~0ms, animations run a single instant
+   frame, and the iteration count is capped. Combined with the JS
+   bail-outs in app.js and hexbg.js, this makes the site usable
+   for people with vestibular conditions / motion sensitivities. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .enter-gate, .video-stage, .progress-track, .skip-hint,
+  .cursor-glitch {
+    display: none !important;
+  }
+}
+
+/* ── Touch-only devices: no cursor follower ────────────────
+   `any-hover: none` is true only when no input device can hover.
+   That excludes the cursor glitch (which has no visual meaning
+   without a persistent on-screen cursor) and saves a video
+   decoder + a render thread on phones / tablets. */
+@media (any-hover: none) {
+  .cursor-glitch {
+    display: none !important;
+  }
+}
+
+::selection {
+  background: rgba(33, 150, 243, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Cursor cues ─────────────────────────────────────────── */
+body[data-phase="waiting"],
+body[data-phase="loading"] {
+  cursor: pointer;
+}
+
+/* ── Click-to-enter gate ─────────────────────────────────── */
+.enter-gate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  background: #020208;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+body[data-phase="loading"]       .enter-gate,
+body[data-phase="logo-hold"]     .enter-gate,
+body[data-phase="transitioning"] .enter-gate,
+body[data-phase="hero"]          .enter-gate {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.enter-logo {
+  /* Square to match the logo MP4's actual 368×368 aspect — a 16:9
+     box was wasting ~43% of horizontal space on internal letterbox
+     bars, making the rose look much smaller than it had to. */
+  width: 480px;
+  height: 480px;
+  margin-bottom: 40px;
+  /* Strong feather on all four edges so the rose melts cleanly into
+     the dark page background. Fade starts earlier (42% vs 55%) and
+     drops to half-opacity sooner so the edge of the rose isn't a
+     visible square outline. */
+  -webkit-mask-image: radial-gradient(
+    circle closest-side at center,
+    #000 42%,
+    rgba(0, 0, 0, 0.5) 72%,
+    rgba(0, 0, 0, 0.12) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: radial-gradient(
+    circle closest-side at center,
+    #000 42%,
+    rgba(0, 0, 0, 0.5) 72%,
+    rgba(0, 0, 0, 0.12) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.enter-text {
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.32);
+  letter-spacing: 0.35em;
+  /* Compensates for the trailing letter-spacing after the last letter
+     so the text is optically centered, not just box-centered. */
+  text-indent: 0.35em;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: 'Geist Mono', 'Space Grotesk', monospace, sans-serif;
+  /* Uses the FLEX variant (no translateX) because this element is
+     already centered by its parent's `align-items: center`. */
+  animation: introFadeUpFlex 1.5s ease 0.5s both;
+}
+
+.enter-ring {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border: 1px solid rgba(33, 150, 243, 0.08);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% - 20px));
+  animation: introRingPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── Cinematic video stage (the intro mp4) ───────────────── */
+.video-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: #020208;
+  opacity: 0;
+  /* Slower, smoother fade-out for the cinematic so the swap to the
+     logo (which sits underneath at z=800, already at opacity 1) feels
+     less like a cut and more like a dissolve. The curve is more "ease"
+     than "linear-feeling" cubic-bezier(0.4,0,0.2,1) — gentler at the
+     end where the eye is most sensitive to abrupt finishes. */
+  transition: opacity 2.2s cubic-bezier(0.33, 0, 0.2, 1);
+}
+body[data-phase="loading"] .video-stage { opacity: 1; }
+
+.video-frame {
+  position: relative;
+  aspect-ratio: 848 / 480;
+  width: min(100vw, calc(100vh * 848 / 480));
+  height: min(100vh, calc(100vw * 480 / 848));
+  background: #000;
+  /* Two composited masks for soft edges:
+       • Horizontal mask fades the left and right 9% to transparent.
+       • Vertical mask fades the top ~5% AND the bottom ~22% to
+         transparent — the soft top makes the cinematic feel like
+         it emerges from the page instead of being pasted on a hard
+         line. The bottom fade is bigger because more of the action
+         (rose reflection, ground smoke) lives there.
+     `mask-composite: intersect` (=`-webkit-mask-composite: source-in`)
+     makes a pixel visible only where BOTH masks are opaque, so the
+     four corners get a stronger compound fade for free. */
+  -webkit-mask-image:
+    linear-gradient(to right,  transparent 0%, #000 9%, #000 91%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 5%, #000 78%, transparent 100%);
+  mask-image:
+    linear-gradient(to right,  transparent 0%, #000 9%, #000 91%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 5%, #000 78%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.intro-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+/* "Frosted glass" watermark cover — blur + soft tint + soft mask. */
+.watermark-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 36%;
+  height: 22%;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  background: radial-gradient(
+    ellipse 115% 115% at top left,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.55) 45%,
+    rgba(0, 0, 0, 0.22) 78%,
+    rgba(0, 0, 0, 0)    100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at top left,
+    #000 0%,
+    #000 55%,
+    rgba(0, 0, 0, 0.4) 82%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at top left,
+    #000 0%,
+    #000 55%,
+    rgba(0, 0, 0, 0.4) 82%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+}
+
+.progress-track {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  z-index: 950;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+body[data-phase="loading"] .progress-track { opacity: 1; }
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    rgba(33, 150, 243, 0.6),
+    rgba(124, 77, 255, 0.5),
+    rgba(224, 64, 251, 0.4)
+  );
+  transition: width 0.3s linear;
+}
+
+.skip-hint {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-family: 'Geist Mono', 'Space Grotesk', monospace, sans-serif;
+  z-index: 950;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+}
+body[data-skip-visible="true"] .skip-hint {
+  opacity: 1;
+  pointer-events: auto;
+  animation: introFadeUp 1s ease both;
+}
+
+/* ── Main animated logo (rose mp4) ───────────────────────── */
+/* Fixed fullscreen; the inner .intro-logo-frame has the same
+   aspect-ratio as the intro video so the swap is seamless. */
+.intro-logo {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  z-index: 800;
+  pointer-events: none;
+  transform: translate(0, 0) scale(1);
+  transform-origin: center center;
+  /* No background by default — the hex grid bleeds through behind the
+     logo container. We add a black background DURING the logo-hold
+     phase only (see below) to cover the letterbox area outside the
+     16:9 frame, then fade it out as the rose moves to the side. */
+  background: transparent;
+  transition:
+    transform 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body[data-logo-visible="true"] .intro-logo {
+  opacity: 1;
+  transition:
+    transform 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0s,            /* instant swap to avoid a black flash */
+    background-color 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Fill the full viewport with solid black during LOGO_HOLD so the
+   letterbox columns (the 183px on each side of a 1554px-wide 16:9
+   frame in a 1920px viewport) don't show the hex grid. As soon as
+   the logo translates to the side (data-logo-corner="true"), the
+   background fades back to transparent and the hex grid re-emerges. */
+body[data-logo-visible="true"]:not([data-logo-corner="true"]) .intro-logo {
+  background: #000;
+}
+
+.intro-logo-frame {
+  position: relative;
+  aspect-ratio: 848 / 480;
+  width: min(100vw, calc(100vh * 848 / 480));
+  height: min(100vh, calc(100vw * 480 / 848));
+  overflow: hidden;
+  /* Solid black background so the letterbox bars (where the square
+     368×368 logo MP4 doesn't reach inside the 16:9 frame) read as
+     opaque black instead of letting the hex grid bleed through via
+     the rose-video's `mix-blend-mode: screen`. The central area is
+     unaffected because the video's own near-black background blends
+     with this black flat-on-flat (screen of 0 over 0 = 0). */
+  background: #000;
+  transition: border-radius 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Rose-side state: translate to LEFT half (desktop) or TOP half
+   (mobile), with rounded corners + soft edge feather. */
+body[data-logo-corner="true"] .intro-logo {
+  transform: translateX(-26%) scale(0.65);
+}
+body[data-logo-corner="true"] .intro-logo-frame {
+  border-radius: 28px;
+  -webkit-mask-image: radial-gradient(
+    circle closest-side at center,
+    #000 55%,
+    rgba(0, 0, 0, 0.55) 80%,
+    rgba(0, 0, 0, 0.15) 93%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: radial-gradient(
+    circle closest-side at center,
+    #000 55%,
+    rgba(0, 0, 0, 0.55) 80%,
+    rgba(0, 0, 0, 0.15) 93%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* After phase=hero, gradually fade the rose out as the user scrolls
+   past the hero so it doesn't sit over the rest of the portfolio. */
+body[data-phase="hero"] .intro-logo {
+  opacity: var(--rose-opacity, 1);
+}
+body[data-phase="hero"] .intro-logo[data-scrolled="true"] {
+  pointer-events: none;
+}
+
+.rose-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* ── Progressive shrinking on smaller desktops ───────────── */
+/* As the viewport narrows, the rose needs to be smaller and further
+   left so it doesn't bleed into the hero text on the right side. */
+@media (max-width: 1500px) {
+  body[data-logo-corner="true"] .intro-logo {
+    transform: translateX(-28%) scale(0.60);
+  }
+}
+@media (max-width: 1300px) {
+  body[data-logo-corner="true"] .intro-logo {
+    transform: translateX(-30%) scale(0.56);
+  }
+}
+@media (max-width: 1100px) {
+  body[data-logo-corner="true"] .intro-logo {
+    transform: translateX(-34%) scale(0.50);
+  }
+}
+
+/* ── Mobile: stack the rose on top, hero text below ──────── */
+@media (max-width: 900px) {
+  .enter-logo {
+    width: 360px;
+    height: 360px;
+    margin-bottom: 32px;
+  }
+  body[data-logo-corner="true"] .intro-logo {
+    /* Mueve hacia ARRIBA (no izquierda) para que la rosa quede sobre
+       el texto. Crece para dominar el hero — es la pieza que el
+       usuario tiene que ver primero al entrar. */
+    transform: translateY(-10%) scale(1.15);
+  }
+}
+
+@media (max-width: 600px) {
+  .enter-logo {
+    width: 280px;
+    height: 280px;
+  }
+  body[data-logo-corner="true"] .intro-logo {
+    /* En teléfono la rosa es LA PIEZA protagonista del hero: bien grande
+       y ligeramente baja para que se acople con el texto sin separarse. */
+    transform: translateY(-6%) scale(1.35);
+  }
+}
+
+/* Pantallas muy chicas (≤400px): la rosa puede ser aún más dominante */
+@media (max-width: 400px) {
+  body[data-logo-corner="true"] .intro-logo {
+    transform: translateY(-4%) scale(1.45);
+  }
+}
+
+/* ── Keyframes ───────────────────────────────────────────── */
+/* For elements centered via `position: fixed; left: 50%; transform:
+   translateX(-50%)` (e.g. .skip-hint) — preserves the centering
+   transform throughout the animation. */
+@keyframes introFadeUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+/* For elements centered by their parent's flex `align-items: center`
+   (e.g. .enter-text) — does NOT apply translateX, which would otherwise
+   shift the element 50% of its own width to the left after the
+   animation ends. */
+@keyframes introFadeUpFlex {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes introRingPulse {
+  0%, 100% {
+    transform: translate(-50%, calc(-50% - 20px)) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 20px)) scale(1.15);
+    opacity: 0;
+  }
+}
