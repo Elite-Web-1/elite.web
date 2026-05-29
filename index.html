@@ -3967,7 +3967,28 @@
           <div class="reviews-stage">
             <!-- Escenario 3D del carrusel -->
             <div class="reviews-showcase" id="reviewsShowcase">
-              <div class="reviews-track" id="reviewsTrack" data-count="2">
+              <!-- ╔══════════════════════════════════════════════════════════╗
+                   ║  👉 PARA AGREGAR UNA RESEÑA NUEVA EN EL FUTURO:           ║
+                   ║                                                            ║
+                   ║  1) Copiá un bloque <article class="review-card" ...>      ║
+                   ║     completo (desde <article> hasta </article>) y pegalo   ║
+                   ║     justo ANTES de cerrar este </div> del reviews-track.   ║
+                   ║                                                            ║
+                   ║  2) En el nuevo <article> cambiá:                          ║
+                   ║       • data-review="N"  → el siguiente número (0,1,2,3…)  ║
+                   ║       • la cantidad de <span>★</span> según las estrellas  ║
+                   ║       • el texto de <p class="review-comment">             ║
+                   ║       • el <span class="review-name">  (nombre)            ║
+                   ║       • el <span class="review-date">  (fecha dd/m/aaaa)   ║
+                   ║                                                            ║
+                   ║  3) Subí el data-count="N" de ESTA línea de abajo al       ║
+                   ║     total de reseñas (ej: con 4 reseñas → data-count="4")  ║
+                   ║                                                            ║
+                   ║  Los puntitos (dots) y la geometría 3D del carrusel se     ║
+                   ║  ajustan SOLOS por JS — no hace falta tocar nada más.      ║
+                   ║  (Soporta hasta 8 reseñas con diseño predefinido.)         ║
+                   ╚══════════════════════════════════════════════════════════╝ -->
+              <div class="reviews-track" id="reviewsTrack" data-count="3">
                 <article class="review-card is-active" data-review="0">
                   <div class="review-stars" aria-label="5 de 5 estrellas">
                     <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
@@ -3989,6 +4010,19 @@
                     <span class="review-date">23/5/2026</span>
                   </div>
                 </article>
+
+                <article class="review-card" data-review="2">
+                  <div class="review-stars" aria-label="5 de 5 estrellas">
+                    <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                  </div>
+                  <p class="review-comment">Probé el sitio en detalle y quedé muy conforme. El diseño es atractivo y coherente de principio a fin, y lo más importante es que todo funciona con fluidez: la navegación, el carrusel de proyectos y sus galerías, el selector de servicios y el proceso paso a paso. La información está muy bien organizada y transmite confianza, con precios claros y un FAQ realmente útil. Se nota la atención al detalle en cada sección.</p>
+                  <div class="review-meta">
+                    <span class="review-name">Tobías</span>
+                    <span class="review-date">29/5/2026</span>
+                  </div>
+                </article>
+                <!-- ⬆️ PEGAR ACÁ las reseñas nuevas (antes de este comentario).
+                     Ver instrucciones completas arriba del reviews-track. -->
               </div>
             </div>
 
@@ -4002,6 +4036,7 @@
               <div class="reviews-dots" id="reviewsDots" role="tablist" aria-label="Reseña activa">
                 <button type="button" class="reviews-dot is-active" data-review="0" aria-label="Reseña 1"></button>
                 <button type="button" class="reviews-dot" data-review="1" aria-label="Reseña 2"></button>
+                <button type="button" class="reviews-dot" data-review="2" aria-label="Reseña 3"></button>
               </div>
               <button type="button" class="reviews-arrow reviews-next" id="reviewsNext" aria-label="Siguiente reseña">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
