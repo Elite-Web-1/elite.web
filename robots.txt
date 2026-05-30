@@ -1,0 +1,8 @@
+# robots.txt — Elite.web
+# Permite que todos los buscadores rastreen todo el sitio.
+
+User-agent: *
+Allow: /
+
+# Ubicación del sitemap para que Google lo encuentre solo.
+Sitemap: https://eliteweb.com.ar/sitemap.xml

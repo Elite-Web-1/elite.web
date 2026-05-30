@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sitemap de Elite.web — lista de URLs para que Google las indexe.
+     Es un sitio de una sola página (one-page); las secciones internas
+     (#sobre-mi, #trabajos, etc.) viven dentro de la misma URL, así que
+     se declara solo la página principal. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://eliteweb.com.ar/</loc>
+    <lastmod>2026-05-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
