@@ -6,22 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
   <meta name="color-scheme" content="dark">
-  <title>Elite.web — Desarrollo web a medida</title>
-  <meta name="description" content="Desarrollador web freelance. Sitios a medida, aplicaciones y PWAs para emprendedores, marcas personales y pymes.">
+  <title>Elite.web — Desarrollo web con enfoque personalizado</title>
+  <meta name="description" content="Creo sitios web a medida para emprendimientos, marcas personales y negocios que quieren una web a la altura de su identidad. Nada de plantillas recicladas.">
+  <link rel="canonical" href="https://eliteweb.com.ar/">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Elite.web — Desarrollo web a medida">
-  <meta property="og:description" content="Diseño web personalizado para emprendedores, marcas y pymes. Tu esencia, llevada a la web.">
-  <meta property="og:image" content="img/og-image.png">
-  <meta property="og:url" content="https://elite-web-ar.netlify.app">
+  <meta property="og:title" content="Elite.web — Desarrollo web con enfoque personalizado">
+  <meta property="og:description" content="Tu esencia, llevada a la web. Sitios a medida para emprendimientos, marcas personales y negocios. Nada de plantillas recicladas.">
+  <meta property="og:image" content="https://eliteweb.com.ar/img/og-image.png">
+  <meta property="og:url" content="https://eliteweb.com.ar/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_AR">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Elite.web — Desarrollo web a medida">
-  <meta name="twitter:description" content="Diseño web personalizado para emprendedores, marcas y pymes.">
-  <meta name="twitter:image" content="img/og-image.png">
+  <meta name="twitter:title" content="Elite.web — Desarrollo web con enfoque personalizado">
+  <meta name="twitter:description" content="Tu esencia, llevada a la web. Sitios web a medida para emprendimientos, marcas personales y negocios.">
+  <meta name="twitter:image" content="https://eliteweb.com.ar/img/og-image.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="img/Logo.png">
@@ -5014,9 +5015,6 @@
       } else { isVisible = true; }
       document.addEventListener('keydown', (e) => {
         if (!isVisible) return;
-        // Si el modal está abierto, las flechas no controlan el carrusel
-        const modal = document.getElementById('reviewModal');
-        if (modal && modal.classList.contains('is-open')) return;
         if (e.key === 'ArrowLeft')  { e.preventDefault(); applyRotation((activeIdx - 1 + total) % total); }
         if (e.key === 'ArrowRight') { e.preventDefault(); applyRotation((activeIdx + 1) % total); }
       });
